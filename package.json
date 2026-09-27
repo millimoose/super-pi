@@ -27,8 +27,10 @@
     "@milkdown/core": "^7.22.2",
     "@milkdown/preset-commonmark": "^7.22.2",
     "@milkdown/react": "^7.22.2",
+    "ajv": "^8.20.0",
     "arktype": "^2.2.5",
     "chokidar": "^5.0.0",
+    "dexie": "^4.4.6",
     "octokit": "^5.0.5",
     "rxdb": "^17.5.0",
     "simple-git": "^4.0.1"

@@ -23,12 +23,18 @@ importers:
       '@milkdown/react':
         specifier: ^7.22.2
         version: 7.22.2(@codemirror/language@6.12.4)(@codemirror/state@6.7.6)(@codemirror/view@6.43.13)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@7.2.0)(typescript@5.9.3)
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       arktype:
         specifier: ^2.2.5
         version: 2.2.5
       chokidar:
         specifier: ^5.0.0
         version: 5.0.0
+      dexie:
+        specifier: ^4.4.6
+        version: 4.4.6
       octokit:
         specifier: ^5.0.5
         version: 5.0.5
@@ -1838,6 +1844,9 @@ packages:
 
   dexie@4.4.2:
     resolution: {integrity: sha512-zMtV8q79EFE5U8FKZvt0Y/77PCU/Hr/RDxv1EDeo228L+m/HTbeN2AjoQm674rhQCX8n3ljK87lajt7UQuZfvw==}
+
+  dexie@4.4.6:
+    resolution: {integrity: sha512-hJP/BO6mjB+tX6hToIO1kmxYLNmun90wYbfcoAoLpKEyDYal/k33dg0TAfoUe2TDsbbLoVIzljJ3BN2UbR5EOg==}
 
   dir-compare@4.2.0:
     resolution: {integrity: sha512-2xMCmOoMrdQIPHdsTawECdNPwlVFB9zGcz3kuhmBO6U3oU+UQjsue0i8ayLKpgBcm+hcXPMVSGUN9d+pvJ6+VQ==}
@@ -6019,6 +6028,8 @@ snapshots:
       dequal: 2.0.3
 
   dexie@4.4.2: {}
+
+  dexie@4.4.6: {}
 
   dir-compare@4.2.0:
     dependencies:

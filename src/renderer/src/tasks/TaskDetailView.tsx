@@ -3,7 +3,8 @@ import { useRxDocument } from 'rxdb/plugins/react'
 import type { SuperPiDatabase } from '@shared/store/repo'
 import type { TaskDoc } from '@shared/store/schema'
 import { EVENTS, STAGES } from '@shared/domain/stageMachine'
-import { runAgentReview, startProducingStage, submitHumanReview } from './orchestrator'
+import { runAgentReview, startProducingStage } from './orchestrator'
+import { ArtifactReviewView } from '../review/ArtifactReviewView'
 
 type Frame = Record<string, unknown>
 
@@ -68,23 +69,6 @@ export function TaskDetailView({
       .finally(() => setBusy(false))
   }
 
-  const humanVerdict = async (verdict: 'approved' | 'changes_requested'): Promise<void> => {
-    setBusy(true)
-    setError(null)
-    const kind = HUMAN_REVIEW_OF[t.stage]
-    if (!kind) {
-      setBusy(false)
-      return
-    }
-    try {
-      await submitHumanReview(db, task.id, kind, verdict, verdict === 'approved' ? 'approved in Super-Pi' : 'changes requested in Super-Pi', [])
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setBusy(false)
-    }
-  }
-
   const steer = async (): Promise<void> => {
     if (!steerText.trim()) return
     try {
@@ -145,14 +129,12 @@ export function TaskDetailView({
           </button>
         )}
         {humanKind && (
-          <>
-            <button disabled={busy} onClick={() => void humanVerdict('approved')}>
-              Approve
-            </button>
-            <button disabled={busy} onClick={() => void humanVerdict('changes_requested')}>
-              Request changes
-            </button>
-          </>
+          <ArtifactReviewView
+            db={db}
+            task={task}
+            kind={humanKind}
+            onDone={() => setError(null)}
+          />
         )}
       </div>
 

@@ -1,7 +1,9 @@
 import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { readFile } from 'fs/promises'
 import { Octokit } from 'octokit'
 import { resolveToken } from './github/auth'
 import { createGithubService } from './github/githubService'
+import { mapAnchorToPosition } from './github/diffPosition'
 import { createTrackerForRepo } from './trackers'
 import type { IssueTracker } from './trackers/tracker'
 import {
@@ -84,7 +86,7 @@ export function registerIpc(services: MainServices): void {
   )
   ipcMain.handle(
     'super-pi:github/createReview',
-    (
+    async (
       _e,
       args: {
         owner: string
@@ -92,10 +94,44 @@ export function registerIpc(services: MainServices): void {
         prNumber: number
         verdict: 'approved' | 'changes_requested'
         summary: string
-        comments: Array<{ path: string; line: number; body: string }>
+        comments: Array<{
+          path: string
+          body: string
+          anchor?: { exact: string; prefix: string; suffix: string }
+        }>
       }
-    ) => github().then((g) => g.createReview(args))
+    ) => {
+      const g = await github()
+      const files = await g.listPRFiles(args)
+      const patchByPath = new Map(files.map((f) => [f.filename, f.patch ?? '']))
+      const mapped: Array<{ path: string; line: number; body: string }> = []
+      const orphaned: string[] = []
+      for (const c of args.comments) {
+        const patch = patchByPath.get(c.path)
+        if (patch && c.anchor) {
+          let content = ''
+          try {
+            content = await readFile(c.path, 'utf8')
+          } catch {
+            content = c.anchor.exact // single-line fallback: match the quote itself
+          }
+          const position = mapAnchorToPosition(patch, content, c.anchor)
+          if (position) {
+            mapped.push({ path: c.path, line: position.line, body: c.body })
+            continue
+          }
+        }
+        orphaned.push(c.anchor ? `"${c.anchor.exact.slice(0, 80)}"` : '(file-level)')
+        orphaned.push(c.body)
+      }
+      const body =
+        orphaned.length > 0 ? `${args.summary}\n\n${orphaned.join('\n')}` : args.summary
+      await g.createReview({ ...args, summary: body, comments: mapped })
+    }
   )
+
+  // artifact content for the review editor (paths come from the local DB)
+  ipcMain.handle('super-pi:prompts/readTextFile', (_e, path: string) => readFile(path, 'utf8'))
 
   // --- tracker ---
   ipcMain.handle('super-pi:tracker/listOpenIssues', (_e, repoPath: string) =>

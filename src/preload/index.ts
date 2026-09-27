@@ -95,7 +95,9 @@ const superPi = {
   },
   prompts: {
     loadReviewerTemplate: (name: string): Promise<string> =>
-      ipcRenderer.invoke('super-pi:prompts/loadReviewerTemplate', name)
+      ipcRenderer.invoke('super-pi:prompts/loadReviewerTemplate', name),
+    readTextFile: (path: string): Promise<string> =>
+      ipcRenderer.invoke('super-pi:prompts/readTextFile', path)
   },
   dialog: {
     pickRepo: (): Promise<string | null> => ipcRenderer.invoke('super-pi:dialog/pickRepo')

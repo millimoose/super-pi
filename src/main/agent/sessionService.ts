@@ -147,17 +147,17 @@ export class SessionService extends EventEmitter {
       await client.prompt(input.prompt)
 
       await new Promise<void>((resolve, reject) => {
-        const onAgentEnd = (frame: RpcFrame) => {
+        const onAgentEnd = (frame: RpcFrame): void => {
           if (frame.isTerminal !== false) {
             cleanup()
             resolve()
           }
         }
-        const onExit = () => {
+        const onExit = (): void => {
           cleanup()
           reject(new Error('omp rpc exited before settling'))
         }
-        const cleanup = () => {
+        const cleanup = (): void => {
           client.off('agent_end', onAgentEnd)
           client.off('exit', onExit)
         }

@@ -4,6 +4,7 @@ import type { SuperPiDatabase } from '@shared/store/repo'
 import type { TaskDoc } from '@shared/store/schema'
 import { EVENTS, STAGES } from '@shared/domain/stageMachine'
 import { runAgentReview, startProducingStage } from './orchestrator'
+import { landTask } from './landing'
 import { ArtifactReviewView } from '../review/ArtifactReviewView'
 
 type Frame = Record<string, unknown>
@@ -140,6 +141,23 @@ export function TaskDetailView({
         )}
         {humanKind && (
           <ArtifactReviewView db={db} task={task} kind={humanKind} onDone={() => setError(null)} />
+        )}
+        {t.stage === 'impl_human_review' && t.prNumber && (
+          <button
+            disabled={busy}
+            onClick={() => {
+              setBusy(true)
+              landTask(db, task.id, {
+                markPRReady: window.superPi.github.markPRReady,
+                mergePR: window.superPi.github.mergePR,
+                removeWorktree: window.superPi.git.removeWorktree
+              })
+                .catch((e: Error) => setError(e.message))
+                .finally(() => setBusy(false))
+            }}
+          >
+            Land (mark PR ready + squash-merge + remove worktree)
+          </button>
         )}
       </div>
 

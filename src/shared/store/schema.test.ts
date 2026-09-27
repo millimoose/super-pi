@@ -1,58 +1,59 @@
 import { type } from 'arktype'
 import { describe, expect, it } from 'vitest'
-import type { RxJsonSchema } from 'rxdb'
-import {
-  Artifact,
-  COLLECTION_SCHEMAS,
-  Comment,
-  Review,
-  Task,
-  artifactSchema,
-  commentSchema,
-  reviewSchema,
-  taskSchema
-} from './schema'
+import { COLLECTION_SCHEMAS, Task } from './schema'
+
+/** Structural view of the derived schemas — avoids RxDB's generic primaryKey typing. */
+interface DerivedSchema {
+  title?: string
+  primaryKey: string
+  indexes?: string[]
+  properties: Record<string, { type?: string; enum?: unknown[]; maxLength?: number }>
+}
+
+const schemas = Object.fromEntries(
+  Object.entries(COLLECTION_SCHEMAS).map(([name, schema]) => [name, schema as unknown as DerivedSchema])
+) as Record<string, DerivedSchema>
 
 describe('derived RxDB schemas', () => {
   it('carry title, version, primaryKey, indexes', () => {
-    expect(taskSchema.title).toBe('tasks')
-    expect(taskSchema.version).toBe(0)
-    expect(taskSchema.primaryKey).toBe('id')
-    expect(taskSchema.indexes).toEqual(['stage'])
-    expect(artifactSchema.indexes).toEqual(['taskId'])
-    expect(reviewSchema.indexes).toEqual(['artifactId'])
-    expect(commentSchema.indexes).toEqual(['reviewId'])
+    expect(schemas.tasks?.title).toBe('tasks')
+    expect(COLLECTION_SCHEMAS.tasks.version).toBe(0)
+    expect(schemas.tasks?.primaryKey).toBe('id')
+    expect(schemas.tasks?.indexes).toEqual(['stage'])
+    expect(schemas.artifacts?.indexes).toEqual(['taskId'])
+    expect(schemas.reviews?.indexes).toEqual(['artifactId'])
+    expect(schemas.comments?.indexes).toEqual(['reviewId'])
   })
 
   it('primary keys carry maxLength', () => {
-    for (const [name, schema] of Object.entries(COLLECTION_SCHEMAS)) {
-      const pk = schema.properties[schema.primaryKey] as { maxLength?: number }
-      expect(pk.maxLength, `${name} pk maxLength`).toBeGreaterThan(0)
+    for (const [name, schema] of Object.entries(schemas)) {
+      const pk = schema.properties[schema.primaryKey]
+      expect(pk?.maxLength, `${name} pk maxLength`).toBeGreaterThan(0)
     }
   })
 
   it('indexed string properties carry maxLength', () => {
-    const cases: Array<[string, RxJsonSchema<unknown>, string]> = [
-      ['tasks', taskSchema, 'stage'],
-      ['artifacts', artifactSchema, 'taskId'],
-      ['reviews', reviewSchema, 'artifactId'],
-      ['comments', commentSchema, 'reviewId']
+    const cases: Array<[string, DerivedSchema, string]> = [
+      ['tasks', schemas.tasks!, 'stage'],
+      ['artifacts', schemas.artifacts!, 'taskId'],
+      ['reviews', schemas.reviews!, 'artifactId'],
+      ['comments', schemas.comments!, 'reviewId']
     ]
     for (const [name, schema, index] of cases) {
-      const prop = schema.properties[index] as { type?: string; maxLength?: number }
-      expect(prop.type, `${name}.${index}`).toBe('string')
-      expect(prop.maxLength, `${name}.${index}`).toBeGreaterThan(0)
+      const prop = schema.properties[index]
+      expect(prop?.type, `${name}.${index}`).toBe('string')
+      expect(prop?.maxLength, `${name}.${index}`).toBeGreaterThan(0)
     }
   })
 
   it('drops the $schema keyword RxDB does not expect', () => {
-    expect('$schema' in taskSchema).toBe(false)
+    expect('$schema' in COLLECTION_SCHEMAS.tasks).toBe(false)
   })
 
   it('emits the stage enum for tasks', () => {
-    const stage = taskSchema.properties['stage'] as { enum?: string[] }
-    expect(stage.enum).toContain('intake')
-    expect(stage.enum).toContain('done')
+    const stage = schemas.tasks?.properties['stage']
+    expect(stage?.enum).toContain('intake')
+    expect(stage?.enum).toContain('done')
   })
 })
 

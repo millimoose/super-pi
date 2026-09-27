@@ -190,6 +190,7 @@ describe('repo helpers over memory storage', () => {
     // before advancing guarantees the emission order
     const { promise, resolve } = Promise.withResolvers<string[]>()
     const sub = db.collections.tasks.findOne('t1').$.subscribe((t) => {
+      if (!t) return
       seen.push(t.stage)
       if (seen.length === 2) {
         sub.unsubscribe()
@@ -212,7 +213,7 @@ describe('dev-only ajv validation wrapper', () => {
         stage: 'not-a-stage',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      })
+      } as never) // deliberately invalid: violates the derived stage enum
     ).rejects.toThrow()
     await db.remove()
   })

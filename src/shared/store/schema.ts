@@ -3,12 +3,14 @@
  * the RxDB JSON-Schema is derived via Type.toJsonSchema().
  */
 import type { RxJsonSchema } from 'rxdb'
-import { STAGES } from '../domain/stageMachine'
+import { STAGES, type Stage } from '../domain/stageMachine'
 import { type } from 'arktype'
 
 const DateString = type('string').describe('ISO-8601 date string')
 
-const StageLiteral = STAGES.map((s) => `'${s}'`).join('|')
+// cast: the joined string is a valid runtime def (verified by schema tests);
+// TS cannot type a dynamically built union literal
+const StageDef = type(STAGES.map((s) => `'${s}'`).join('|') as never)
 
 export const Task = type({
   id: 'string <= 100',
@@ -26,7 +28,7 @@ export const Task = type({
   branch: 'string',
   'worktreePath?': 'string',
   'prNumber?': 'number',
-  stage: StageLiteral,
+  stage: StageDef,
   createdAt: DateString,
   updatedAt: DateString
 })
@@ -65,7 +67,9 @@ export const Comment = type({
   createdAt: DateString
 })
 
-export type TaskDoc = typeof Task.infer
+// arktype cannot infer TS types from a dynamically built union def string,
+// so stage is patched from the same STAGES source the runtime def uses
+export type TaskDoc = Omit<typeof Task.infer, 'stage'> & { stage: Stage }
 export type ArtifactDoc = typeof Artifact.infer
 export type ReviewDoc = typeof Review.infer
 export type CommentDoc = typeof Comment.infer
@@ -84,7 +88,7 @@ export function rxSchema<T>(
 ): RxJsonSchema<T> {
   const js = t.toJsonSchema({
     // insurance only: timestamps are strings, this should never fire
-    fallback: { date: (ctx) => ({ ...(ctx.base as object), type: 'string', format: 'date-time' }) }
+    fallback: { date: (ctx: { base: object }) => ({ ...ctx.base, type: 'string', format: 'date-time' }) }
   }) as {
     $schema?: unknown
     properties: Record<string, { type?: string; enum?: unknown[]; maxLength?: number }>

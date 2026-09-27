@@ -20,12 +20,13 @@ export type TaskInput = Omit<TaskDoc, 'stage' | 'createdAt' | 'updatedAt'> & { s
 
 export async function createTask(db: SuperPiDatabase, input: TaskInput): Promise<RxDocument<TaskDoc>> {
   const now = new Date().toISOString()
-  return db.collections.tasks.insert({
+  const doc: TaskDoc = {
     ...input,
     stage: input.stage ?? 'intake',
     createdAt: now,
     updatedAt: now
-  })
+  }
+  return db.collections.tasks.insert(doc)
 }
 
 export interface ArtifactInput {
@@ -105,7 +106,13 @@ export async function advanceTask(
   const task = await db.collections.tasks.findOne(taskId).exec()
   if (!task) throw new Error(`unknown task ${taskId}`)
   const result = transition(task.stage, event)
-  await task.incrementalPatch({ stage: result.stage, updatedAt: new Date().toISOString() })
+  // rxdb's generic-this patch typing loses the doc type on bare literals;
+  // pass a pre-typed Partial (probe-verified)
+  const patch: Partial<TaskDoc> = {
+    stage: result.stage,
+    updatedAt: new Date().toISOString()
+  }
+  await task.patch(patch)
   return result.stage
 }
 

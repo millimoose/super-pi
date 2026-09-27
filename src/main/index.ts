@@ -1,7 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { SessionService } from './agent/sessionService'
+import { registerIpc } from './ipc'
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
+if (!gotSingleInstanceLock) {
+  app.quit()
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -49,8 +56,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // stateless capability layer: git / github / tracker / agent / prompts / dialog
+  registerIpc({
+    sessionService: new SessionService({ appDataDir: app.getPath('userData') }),
+    appDataDir: app.getPath('userData')
+  })
 
   createWindow()
 

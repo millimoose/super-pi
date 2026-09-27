@@ -1,34 +1,24 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useEffect, useState } from 'react'
+import { DatabaseProvider, getDatabase } from './db/database'
+import type { RendererDatabase } from './db/database'
+import { TaskListView } from './tasks/TaskListView'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const [db, setDb] = useState<RendererDatabase | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    getDatabase()
+      .then(setDb)
+      .catch((e: Error) => setError(e.message))
+  }, [])
+
+  if (error) return <div style={{ padding: 16, color: '#c00' }}>database error: {error}</div>
+  if (!db) return <div style={{ padding: 16, fontFamily: 'system-ui' }}>Loading…</div>
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    <DatabaseProvider>
+      <TaskListView db={db} />
+    </DatabaseProvider>
   )
 }
 

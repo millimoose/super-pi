@@ -38,9 +38,9 @@ describe('findAnchor', () => {
 
   it('returns orphaned when the text is gone', () => {
     const from = DOC.indexOf('dark mode')
-    expect(findAnchor(DOC.replace('dark mode', 'light mode'), createAnchor(DOC, from, from + 9))).toBe(
-      'orphaned'
-    )
+    expect(
+      findAnchor(DOC.replace('dark mode', 'light mode'), createAnchor(DOC, from, from + 9))
+    ).toBe('orphaned')
   })
 
   it('returns orphaned when still ambiguous after context filtering', () => {

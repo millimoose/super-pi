@@ -94,7 +94,9 @@ export function ArtifactReviewView({
         task.id,
         kind,
         verdict,
-        verdict === 'approved' ? 'Approved in Super-Pi review' : 'Changes requested in Super-Pi review',
+        verdict === 'approved'
+          ? 'Approved in Super-Pi review'
+          : 'Changes requested in Super-Pi review',
         comments.map((c) => ({ anchor: c.anchor, body: c.body }))
       )
       onDone()
@@ -117,7 +119,13 @@ export function ArtifactReviewView({
       </legend>
       <div
         onMouseUp={addCommentFromSelection}
-        style={{ border: '1px solid #ddd', borderRadius: 4, padding: 12, maxHeight: 400, overflow: 'auto' }}
+        style={{
+          border: '1px solid #ddd',
+          borderRadius: 4,
+          padding: 12,
+          maxHeight: 400,
+          overflow: 'auto'
+        }}
       >
         <MilkdownProvider>
           <Milkdown />
@@ -125,7 +133,10 @@ export function ArtifactReviewView({
       </div>
 
       {comments.map((c, i) => (
-        <div key={c.key} style={{ border: '1px solid #ccc', borderRadius: 4, padding: 8, margin: '8px 0' }}>
+        <div
+          key={c.key}
+          style={{ border: '1px solid #ccc', borderRadius: 4, padding: 8, margin: '8px 0' }}
+        >
           <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>
             {findAnchor(markdown, c.anchor) === 'orphaned'
               ? '⚠ orphaned'
@@ -152,13 +163,19 @@ export function ArtifactReviewView({
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
         <button
           onClick={() => setVerdict('approved')}
-          style={{ background: verdict === 'approved' ? '#0a0' : undefined, color: verdict === 'approved' ? '#fff' : undefined }}
+          style={{
+            background: verdict === 'approved' ? '#0a0' : undefined,
+            color: verdict === 'approved' ? '#fff' : undefined
+          }}
         >
           Approve
         </button>
         <button
           onClick={() => setVerdict('changes_requested')}
-          style={{ background: verdict === 'changes_requested' ? '#c60' : undefined, color: verdict === 'changes_requested' ? '#fff' : undefined }}
+          style={{
+            background: verdict === 'changes_requested' ? '#c60' : undefined,
+            color: verdict === 'changes_requested' ? '#fff' : undefined
+          }}
         >
           Request changes
         </button>

@@ -95,14 +95,24 @@ export function TaskDetailView({
       </div>
 
       {/* stage timeline */}
-      <ol style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: 0, fontSize: 11, listStyle: 'none' }}>
+      <ol
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 4,
+          padding: 0,
+          fontSize: 11,
+          listStyle: 'none'
+        }}
+      >
         {STAGES.map((s) => (
           <li
             key={s}
             style={{
               padding: '2px 6px',
               borderRadius: 3,
-              background: s === t.stage ? '#06c' : s === 'done' && t.stage === 'done' ? '#0a0' : '#eee',
+              background:
+                s === t.stage ? '#06c' : s === 'done' && t.stage === 'done' ? '#0a0' : '#eee',
               color: s === t.stage ? '#fff' : '#333'
             }}
           >
@@ -129,12 +139,7 @@ export function TaskDetailView({
           </button>
         )}
         {humanKind && (
-          <ArtifactReviewView
-            db={db}
-            task={task}
-            kind={humanKind}
-            onDone={() => setError(null)}
-          />
+          <ArtifactReviewView db={db} task={task} kind={humanKind} onDone={() => setError(null)} />
         )}
       </div>
 

@@ -77,18 +77,18 @@ export class RpcClient extends EventEmitter {
 
     this.ready = new Promise<RpcFrame>(
       (resolve: (frame: RpcFrame) => void, reject: (err: Error) => void) => {
-      const timer = setTimeout(() => reject(new Error('omp rpc: no ready frame')), 15_000)
-      const onReady = (frame: RpcFrame): void => {
-        clearTimeout(timer)
-        this.off('exit', onExit)
-        resolve(frame)
-      }
-      const onExit = (): void => {
-        clearTimeout(timer)
-        reject(new Error('omp rpc exited before ready'))
-      }
-      this.once('ready_frame', onReady)
-      this.once('exit', onExit)
+        const timer = setTimeout(() => reject(new Error('omp rpc: no ready frame')), 15_000)
+        const onReady = (frame: RpcFrame): void => {
+          clearTimeout(timer)
+          this.off('exit', onExit)
+          resolve(frame)
+        }
+        const onExit = (): void => {
+          clearTimeout(timer)
+          reject(new Error('omp rpc exited before ready'))
+        }
+        this.once('ready_frame', onReady)
+        this.once('exit', onExit)
       }
     )
   }

@@ -1,5 +1,11 @@
 import { buildBrainstormPrompt, buildPlanPrompt, buildImplementPrompt } from '@shared/agent/prompts'
-import { advanceTask, createTask, recordArtifact, recordReview, latestArtifact } from '@shared/store/repo'
+import {
+  advanceTask,
+  createTask,
+  recordArtifact,
+  recordReview,
+  latestArtifact
+} from '@shared/store/repo'
 import type { SuperPiDatabase } from '@shared/store/repo'
 import type { TaskDoc } from '@shared/store/schema'
 import type { StageResult, ReviewResult } from '@shared/agent/resultSchemas'
@@ -15,10 +21,7 @@ type StageOutcome =
   | { kind: 'review'; result: ReviewResult }
   | { kind: 'failure'; error: string; transcript: string[] }
 
-async function runStage(
-  task: TaskDoc,
-  prompt: string
-): Promise<StageOutcome> {
+async function runStage(task: TaskDoc, prompt: string): Promise<StageOutcome> {
   const outcome = (await window.superPi.agent.startStage({
     taskId: task.id,
     worktreePath: task.worktreePath ?? '',
@@ -146,7 +149,10 @@ export async function submitHumanReview(
   kind: 'spec' | 'plan' | 'implementation',
   verdict: 'approved' | 'changes_requested',
   summary: string,
-  comments: Array<{ anchor: { exact: string; prefix: string; suffix: string } | null; body: string }>
+  comments: Array<{
+    anchor: { exact: string; prefix: string; suffix: string } | null
+    body: string
+  }>
 ): Promise<void> {
   const artifact = await latestArtifact(db, taskId, kind)
   if (!artifact) throw new Error(`no ${kind} artifact to review`)

@@ -55,7 +55,11 @@ export function TaskListView({ db }: { db: SuperPiDatabase }): React.JSX.Element
         {tasks && tasks.length === 0 && <li style={{ color: '#888' }}>No tasks yet.</li>}
       </ul>
       {newDialogOpen && (
-        <NewTaskDialog db={db} onClose={() => setNewDialogOpen(false)} onCreated={() => setNewDialogOpen(false)} />
+        <NewTaskDialog
+          db={db}
+          onClose={() => setNewDialogOpen(false)}
+          onCreated={() => setNewDialogOpen(false)}
+        />
       )}
     </div>
   )

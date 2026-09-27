@@ -6,13 +6,7 @@ import { createGithubService } from './github/githubService'
 import { mapAnchorToPosition } from './github/diffPosition'
 import { createTrackerForRepo } from './trackers'
 import type { IssueTracker } from './trackers/tracker'
-import {
-  createWorktree,
-  removeWorktree,
-  commitAll,
-  push,
-  branchPoint
-} from './git/worktreeService'
+import { createWorktree, removeWorktree, commitAll, push, branchPoint } from './git/worktreeService'
 import { SessionService } from './agent/sessionService'
 import { generateTitleSlug } from './agent/titleSlugService'
 import { loadReviewerTemplate } from './prompts/templates'
@@ -52,10 +46,14 @@ type Json = Record<string, unknown>
 
 export function registerIpc(services: MainServices): void {
   // --- git ---
-  ipcMain.handle('super-pi:git/createWorktree', (_e, repoPath: string, branch: string, baseRef?: string) =>
-    createWorktree(repoPath, branch, baseRef ?? 'HEAD')
+  ipcMain.handle(
+    'super-pi:git/createWorktree',
+    (_e, repoPath: string, branch: string, baseRef?: string) =>
+      createWorktree(repoPath, branch, baseRef ?? 'HEAD')
   )
-  ipcMain.handle('super-pi:git/removeWorktree', (_e, worktreePath: string) => removeWorktree(worktreePath))
+  ipcMain.handle('super-pi:git/removeWorktree', (_e, worktreePath: string) =>
+    removeWorktree(worktreePath)
+  )
   ipcMain.handle('super-pi:git/commitAll', (_e, worktreePath: string, message: string) =>
     commitAll(worktreePath, message)
   )
@@ -68,16 +66,20 @@ export function registerIpc(services: MainServices): void {
   ipcMain.handle('super-pi:github/hasToken', () => resolveToken().then((t) => t !== undefined))
   ipcMain.handle(
     'super-pi:github/createDraftPR',
-    (_e, args: { owner: string; repo: string; head: string; base: string; title: string; body: string }) =>
-      github().then((g) => g.createDraftPR(args))
+    (
+      _e,
+      args: { owner: string; repo: string; head: string; base: string; title: string; body: string }
+    ) => github().then((g) => g.createDraftPR(args))
   )
   ipcMain.handle(
     'super-pi:github/markPRReady',
     (_e, args: { owner: string; repo: string; prNumber: number }) =>
       github().then((g) => g.markPRReady(args))
   )
-  ipcMain.handle('super-pi:github/mergePR', (_e, args: { owner: string; repo: string; prNumber: number }) =>
-    github().then((g) => g.mergePR(args))
+  ipcMain.handle(
+    'super-pi:github/mergePR',
+    (_e, args: { owner: string; repo: string; prNumber: number }) =>
+      github().then((g) => g.mergePR(args))
   )
   ipcMain.handle(
     'super-pi:github/listPRFiles',
@@ -124,8 +126,7 @@ export function registerIpc(services: MainServices): void {
         orphaned.push(c.anchor ? `"${c.anchor.exact.slice(0, 80)}"` : '(file-level)')
         orphaned.push(c.body)
       }
-      const body =
-        orphaned.length > 0 ? `${args.summary}\n\n${orphaned.join('\n')}` : args.summary
+      const body = orphaned.length > 0 ? `${args.summary}\n\n${orphaned.join('\n')}` : args.summary
       await g.createReview({ ...args, summary: body, comments: mapped })
     }
   )
@@ -149,10 +150,7 @@ export function registerIpc(services: MainServices): void {
   // --- agent ---
   ipcMain.handle(
     'super-pi:agent/startStage',
-    async (
-      e,
-      args: { taskId: string; worktreePath: string; prompt: string }
-    ): Promise<Json> => {
+    async (e, args: { taskId: string; worktreePath: string; prompt: string }): Promise<Json> => {
       const outcome = await services.sessionService.startStage(
         args.taskId,
         { worktreePath: args.worktreePath, prompt: args.prompt },
@@ -171,9 +169,8 @@ export function registerIpc(services: MainServices): void {
   ipcMain.handle('super-pi:agent/stop', (_e, taskId: string) =>
     services.sessionService.stopSession(taskId)
   )
-  ipcMain.handle(
-    'super-pi:agent/generateTitleSlug',
-    (_e, prompt: string, repoPath: string) => generateTitleSlug(prompt, { cwd: repoPath })
+  ipcMain.handle('super-pi:agent/generateTitleSlug', (_e, prompt: string, repoPath: string) =>
+    generateTitleSlug(prompt, { cwd: repoPath })
   )
 
   // --- prompts (reviewer templates) ---

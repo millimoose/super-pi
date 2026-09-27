@@ -39,14 +39,14 @@ export function NewTaskDialog({
 
   useEffect(() => {
     if (!repoPath) return
-    setSelectedIssue(null)
-    setIssues([])
+    let cancelled = false
     window.superPi.tracker
       .listOpenIssues(repoPath)
-      .then(setIssues)
-      .then(() => {
-        // derive owner/repo from an issue url to avoid re-parsing the remote
-        const first = issues[0]
+      .then((list) => {
+        if (cancelled) return
+        setSelectedIssue(null)
+        setIssues(list)
+        const first = list[0]
         if (first) {
           const m = /github\.com\/([^/]+)\/([^/]+)/.exec(first.url)
           if (m) {
@@ -55,8 +55,12 @@ export function NewTaskDialog({
           }
         }
       })
-      .catch((e: Error) => setError(e.message))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      .catch((e: Error) => {
+        if (!cancelled) setError(e.message)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [repoPath])
 
   const filtered = useMemo(() => {
@@ -103,7 +107,10 @@ export function NewTaskDialog({
         issue = selectedIssue
         slug = kebab(selectedIssue.title)
       } else {
-        const { title, slug: generated } = await window.superPi.agent.generateTitleSlug(prompt, repoPath)
+        const { title, slug: generated } = await window.superPi.agent.generateTitleSlug(
+          prompt,
+          repoPath
+        )
         issue = await window.superPi.tracker.createIssue(repoPath, {
           title,
           body: `${prompt}\n\n_Created by Super-Pi._`
@@ -145,7 +152,16 @@ export function NewTaskDialog({
         justifyContent: 'center'
       }}
     >
-      <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 560, maxHeight: '80vh', overflow: 'auto' }}>
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 8,
+          padding: 20,
+          width: 560,
+          maxHeight: '80vh',
+          overflow: 'auto'
+        }}
+      >
         <h2 style={{ marginTop: 0 }}>New task</h2>
 
         <div style={{ marginBottom: 12 }}>
@@ -166,7 +182,15 @@ export function NewTaskDialog({
             disabled={!repoPath}
           />
         </div>
-        <ul style={{ listStyle: 'none', padding: 0, maxHeight: 160, overflow: 'auto', marginBottom: 12 }}>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            maxHeight: 160,
+            overflow: 'auto',
+            marginBottom: 12
+          }}
+        >
           {filtered.map((i) => (
             <li
               key={i.id}

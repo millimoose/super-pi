@@ -69,8 +69,7 @@ const superPi = {
       taskId: string
       worktreePath: string
       prompt: string
-    }): Promise<Record<string, unknown>> =>
-      ipcRenderer.invoke('super-pi:agent/startStage', args),
+    }): Promise<Record<string, unknown>> => ipcRenderer.invoke('super-pi:agent/startStage', args),
     steer: (taskId: string, text: string): Promise<void> =>
       ipcRenderer.invoke('super-pi:agent/steer', taskId, text),
     stop: (taskId: string): Promise<void> => ipcRenderer.invoke('super-pi:agent/stop', taskId),
@@ -82,11 +81,12 @@ const superPi = {
   },
   agentEvents: {
     /** Subscribe to validated RPC frames for one task. Returns unsubscribe. */
-    subscribe: (
-      taskId: string,
-      cb: (frame: Record<string, unknown>) => void
-    ): (() => void) => {
-      const listener = (_e: Electron.IpcRendererEvent, id: string, frame: Record<string, unknown>): void => {
+    subscribe: (taskId: string, cb: (frame: Record<string, unknown>) => void): (() => void) => {
+      const listener = (
+        _e: Electron.IpcRendererEvent,
+        id: string,
+        frame: Record<string, unknown>
+      ): void => {
         if (id === taskId) cb(frame)
       }
       ipcRenderer.on('super-pi:agent-event', listener)

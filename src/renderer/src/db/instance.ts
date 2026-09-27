@@ -1,15 +1,7 @@
-import { useMemo } from 'react'
-import type { ReactNode } from 'react'
 import { createRxDatabase } from 'rxdb'
 import type { RxCollection, RxDatabase, RxDocument } from 'rxdb'
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie'
-import { RxDatabaseProvider } from 'rxdb/plugins/react'
-import {
-  artifactSchema,
-  commentSchema,
-  reviewSchema,
-  taskSchema
-} from '@shared/store/schema'
+import { artifactSchema, commentSchema, reviewSchema, taskSchema } from '@shared/store/schema'
 import type { ArtifactDoc, CommentDoc, ReviewDoc, TaskDoc } from '@shared/store/schema'
 import type { SuperPiCollections } from '@shared/store/repo'
 
@@ -40,11 +32,6 @@ export function getDatabase(): Promise<RendererDatabase> {
     )
   }
   return dbPromise
-}
-
-export function DatabaseProvider({ children }: { children: ReactNode }): React.JSX.Element {
-  const db = useMemo(() => getDatabase(), [])
-  return <RxDatabaseProvider database={db as never}>{children}</RxDatabaseProvider>
 }
 
 export type { SuperPiCollections, TaskDoc, ArtifactDoc, ReviewDoc, CommentDoc }

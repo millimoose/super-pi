@@ -16,10 +16,11 @@ let dbPromise: Promise<RendererDatabase> | null = null
 
 export function getDatabase(): Promise<RendererDatabase> {
   if (!dbPromise) {
+    // no ignoreDuplicate here: it throws DB9 outside RxDB dev-mode, and the
+    // module-level promise already guarantees a single instance per process
     dbPromise = createRxDatabase<SuperPiCollections>({
       name: 'super-pi',
-      storage: getRxStorageDexie(),
-      ignoreDuplicate: true
+      storage: getRxStorageDexie()
     }).then((db) =>
       db
         .addCollections({

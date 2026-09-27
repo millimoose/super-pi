@@ -1,9 +1,9 @@
 {
   "name": "super-pi",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Super-Pi: Electron GUI orchestrating the OMP harness with the superpowers stage workflow",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "millimoose",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

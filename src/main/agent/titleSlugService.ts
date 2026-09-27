@@ -76,7 +76,13 @@ export async function generateTitleSlug(
 ): Promise<TitleSlug> {
   const ompBin = options.ompBin ?? process.env['SUPER_PI_OMP_BIN'] ?? 'omp'
   const prefix = options.ompArgs ?? []
-  const baseArgs = [...prefix, '-p', '--no-title', '--max-time', String(options.maxTimeSeconds ?? 60)]
+  const baseArgs = [
+    ...prefix,
+    '-p',
+    '--no-title',
+    '--max-time',
+    String(options.maxTimeSeconds ?? 60)
+  ]
 
   async function tryOnce(args: string[]): Promise<TitleSlug | null> {
     try {

@@ -11,7 +11,10 @@ interface DerivedSchema {
 }
 
 const schemas = Object.fromEntries(
-  Object.entries(COLLECTION_SCHEMAS).map(([name, schema]) => [name, schema as unknown as DerivedSchema])
+  Object.entries(COLLECTION_SCHEMAS).map(([name, schema]) => [
+    name,
+    schema as unknown as DerivedSchema
+  ])
 ) as Record<string, DerivedSchema>
 
 describe('derived RxDB schemas', () => {

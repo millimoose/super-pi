@@ -53,11 +53,23 @@ rl.on('line', (line) => {
   switch (cmd.type) {
     case 'set_event_filter':
     case 'set_host_tools':
-      send({ id: cmd.id, type: 'response', command: cmd.type, success: true, data: { toolNames: [] } })
+      send({
+        id: cmd.id,
+        type: 'response',
+        command: cmd.type,
+        success: true,
+        data: { toolNames: [] }
+      })
       break
     case 'prompt':
       promptCmds.push(cmd)
-      send({ id: cmd.id, type: 'response', command: 'prompt', success: true, data: { agentInvoked: true } })
+      send({
+        id: cmd.id,
+        type: 'response',
+        command: 'prompt',
+        success: true,
+        data: { agentInvoked: true }
+      })
       void runPrompt(cmd)
       break
     case 'steer':
@@ -67,7 +79,12 @@ rl.on('line', (line) => {
       send({ id: cmd.id, type: 'response', command: 'abort', success: true })
       break
     default:
-      send({ type: 'response', command: cmd.type, success: false, error: `fake-omp: unsupported ${cmd.type}` })
+      send({
+        type: 'response',
+        command: cmd.type,
+        success: false,
+        error: `fake-omp: unsupported ${cmd.type}`
+      })
   }
 })
 
@@ -91,7 +108,11 @@ async function runPrompt(cmd) {
   if (mode === 'rpc-marker') {
     await writeFile(
       join(cwd, '.super-pi', 'stage-result.json'),
-      JSON.stringify({ stage: 'brainstorming', status: 'complete', artifactPath: 'docs/superpowers/spec.md' })
+      JSON.stringify({
+        stage: 'brainstorming',
+        status: 'complete',
+        artifactPath: 'docs/superpowers/spec.md'
+      })
     )
   } else {
     // host tool call path
@@ -101,7 +122,11 @@ async function runPrompt(cmd) {
       id: callId,
       toolCallId: `toolu_${reqN}`,
       toolName: 'super_pi_stage_result',
-      arguments: { stage: 'brainstorming', status: 'complete', artifactPath: 'docs/superpowers/spec.md' }
+      arguments: {
+        stage: 'brainstorming',
+        status: 'complete',
+        artifactPath: 'docs/superpowers/spec.md'
+      }
     })
     // wait for the host's result frame before settling
     await new Promise((resolve) => {

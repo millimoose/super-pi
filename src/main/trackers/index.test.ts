@@ -25,11 +25,19 @@ describe('parseGithubRemote', () => {
 import { createGithubTracker } from './githubTracker'
 import type { GithubIssuesApi } from './githubTracker'
 
-function stubApi(issue: Partial<{
-  list: Array<{ number: number; title: string; html_url: string; body: string | null; pull_request?: object }>
-  single: { number: number; title: string; html_url: string; body: string | null }
-  created: { number: number; title: string; html_url: string; body: string | null }
-}>): { api: GithubIssuesApi; calls: string[] } {
+function stubApi(
+  issue: Partial<{
+    list: Array<{
+      number: number
+      title: string
+      html_url: string
+      body: string | null
+      pull_request?: object
+    }>
+    single: { number: number; title: string; html_url: string; body: string | null }
+    created: { number: number; title: string; html_url: string; body: string | null }
+  }>
+): { api: GithubIssuesApi; calls: string[] } {
   const calls: string[] = []
   return {
     calls,
@@ -47,7 +55,12 @@ function stubApi(issue: Partial<{
           async create(params) {
             calls.push(`create:${params.title}`)
             return {
-              data: issue.created ?? { number: 0, title: params.title, html_url: '', body: params.body }
+              data: issue.created ?? {
+                number: 0,
+                title: params.title,
+                html_url: '',
+                body: params.body
+              }
             }
           }
         }
@@ -60,8 +73,19 @@ describe('githubTracker', () => {
   it('listOpen filters out pull requests and maps fields', async () => {
     const { api } = stubApi({
       list: [
-        { number: 1, title: 'Real issue', html_url: 'https://github.com/o/r/issues/1', body: 'body' },
-        { number: 2, title: 'A PR', html_url: 'https://github.com/o/r/pull/2', body: null, pull_request: {} }
+        {
+          number: 1,
+          title: 'Real issue',
+          html_url: 'https://github.com/o/r/issues/1',
+          body: 'body'
+        },
+        {
+          number: 2,
+          title: 'A PR',
+          html_url: 'https://github.com/o/r/pull/2',
+          body: null,
+          pull_request: {}
+        }
       ]
     })
     const tracker = createGithubTracker(api, 'octo', 'hello')
@@ -78,7 +102,10 @@ describe('githubTracker', () => {
     })
     const tracker = createGithubTracker(api, 'octo', 'hello')
     expect(await tracker.get('7')).toEqual({
-      id: '7', title: 'Broken build', url: 'u7', body: 'it breaks'
+      id: '7',
+      title: 'Broken build',
+      url: 'u7',
+      body: 'it breaks'
     })
     const created = await tracker.create({ title: 'New thing', body: 'do it' })
     expect(created).toEqual({ id: '9', title: 'New thing', url: 'u9', body: 'do it' })
@@ -87,12 +114,7 @@ describe('githubTracker', () => {
 })
 
 // ---- diffPosition ----
-const CONTENT = [
-  'line one',
-  'added by agent',
-  'kept context line',
-  'tail'
-].join('\n')
+const CONTENT = ['line one', 'added by agent', 'kept context line', 'tail'].join('\n')
 
 const PATCH = [
   'diff --git a/file.md b/file.md',
@@ -130,7 +152,11 @@ describe('mapAnchorToPosition', () => {
   it('returns null for text present in the file but outside the diff', () => {
     // 'tail' sits at line 4; the patch's RIGHT side never reaches line 4
     expect(
-      mapAnchorToPosition(PATCH, CONTENT, { exact: 'tail', prefix: 'kept context line\n', suffix: '' })
+      mapAnchorToPosition(PATCH, CONTENT, {
+        exact: 'tail',
+        prefix: 'kept context line\n',
+        suffix: ''
+      })
     ).toBeNull()
   })
 

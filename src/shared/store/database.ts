@@ -1,10 +1,5 @@
 import { createRxDatabase, type RxDatabase } from 'rxdb'
-import {
-  artifactSchema,
-  commentSchema,
-  reviewSchema,
-  taskSchema
-} from './schema'
+import { artifactSchema, commentSchema, reviewSchema, taskSchema } from './schema'
 import type { SuperPiCollections, SuperPiDatabase } from './repo'
 
 export type { RxDatabase, SuperPiCollections, SuperPiDatabase }

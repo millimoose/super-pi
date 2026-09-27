@@ -33,7 +33,9 @@ beforeEach(async () => {
 
 afterEach(async () => {
   // worktrees registered against repoDir keep it alive; prune first
-  await simpleGit(repoDir).raw(['worktree', 'prune', '--force']).catch(() => {})
+  await simpleGit(repoDir)
+    .raw(['worktree', 'prune', '--force'])
+    .catch(() => {})
   await rm(repoDir, { recursive: true, force: true })
 })
 

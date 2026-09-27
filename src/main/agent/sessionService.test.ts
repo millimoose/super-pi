@@ -72,7 +72,12 @@ describe('sessionService over fake-omp', () => {
     const { db, repo } = await makeEnv()
     const appData = await mkdtemp(join(tmpdir(), 'super-pi-data-'))
     dirs.push(appData)
-    const service = new SessionService({ ompBin: NODE, ompArgs: [FAKE_OMP], env: { SUPER_PI_FAKE_MODE: 'rpc' }, appDataDir: appData })
+    const service = new SessionService({
+      ompBin: NODE,
+      ompArgs: [FAKE_OMP],
+      env: { SUPER_PI_FAKE_MODE: 'rpc' },
+      appDataDir: appData
+    })
     const task = await createTask(db, { ...taskInput })
 
     await advanceTask(db, task.id, 'start')
@@ -87,7 +92,12 @@ describe('sessionService over fake-omp', () => {
     expect(outcome.result.status).toBe('complete')
     expect(outcome.result.artifactPath).toBe('docs/superpowers/spec.md')
 
-    await recordArtifact(db, { id: 'a1', taskId: task.id, kind: 'spec', path: 'docs/superpowers/spec.md' })
+    await recordArtifact(db, {
+      id: 'a1',
+      taskId: task.id,
+      kind: 'spec',
+      path: 'docs/superpowers/spec.md'
+    })
     expect(await advanceTask(db, task.id, 'stage_complete')).toBe('spec_agent_review')
 
     const reviewOutcome = await service.startStage(task.id, {
@@ -113,7 +123,12 @@ describe('sessionService over fake-omp', () => {
     const { repo } = await makeEnv()
     const appData = await mkdtemp(join(tmpdir(), 'super-pi-data-'))
     dirs.push(appData)
-    const service = new SessionService({ ompBin: NODE, ompArgs: [FAKE_OMP], env: { SUPER_PI_FAKE_MODE: 'rpc-marker' }, appDataDir: appData })
+    const service = new SessionService({
+      ompBin: NODE,
+      ompArgs: [FAKE_OMP],
+      env: { SUPER_PI_FAKE_MODE: 'rpc-marker' },
+      appDataDir: appData
+    })
     const outcome = await service.startStage('t-marker', {
       worktreePath: repo,
       prompt: 'produce the artifact'
@@ -126,7 +141,12 @@ describe('sessionService over fake-omp', () => {
     const { repo } = await makeEnv()
     const appData = await mkdtemp(join(tmpdir(), 'super-pi-data-'))
     dirs.push(appData)
-    const service = new SessionService({ ompBin: NODE, ompArgs: [FAKE_OMP], env: { SUPER_PI_FAKE_MODE: 'rpc-exit' }, appDataDir: appData })
+    const service = new SessionService({
+      ompBin: NODE,
+      ompArgs: [FAKE_OMP],
+      env: { SUPER_PI_FAKE_MODE: 'rpc-exit' },
+      appDataDir: appData
+    })
     const outcome = await service.startStage('t-exit', {
       worktreePath: repo,
       prompt: 'do work'

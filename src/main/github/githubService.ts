@@ -21,11 +21,7 @@ export interface GithubService {
   }): Promise<number>
   markPRReady(input: { owner: string; repo: string; prNumber: number }): Promise<void>
   mergePR(input: { owner: string; repo: string; prNumber: number }): Promise<void>
-  listPRFiles(input: {
-    owner: string
-    repo: string
-    prNumber: number
-  }): Promise<PullRequestFile[]>
+  listPRFiles(input: { owner: string; repo: string; prNumber: number }): Promise<PullRequestFile[]>
   createReview(input: {
     owner: string
     repo: string

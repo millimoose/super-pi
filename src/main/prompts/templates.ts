@@ -23,7 +23,8 @@ function vendoredDir(): string {
 
 /** Newest `claude-plugins-official___superpowers___<ver>` skills dir, or null. */
 export function resolveSuperpowersSkillsDir(): string | null {
-  const base = process.env['SUPER_PI_SKILLS_BASE'] ?? join(homedir(), '.omp', 'plugins', 'cache', 'plugins')
+  const base =
+    process.env['SUPER_PI_SKILLS_BASE'] ?? join(homedir(), '.omp', 'plugins', 'cache', 'plugins')
   let entries: string[]
   try {
     entries = readdirSync(base)
@@ -43,10 +44,7 @@ export function resolveSuperpowersSkillsDir(): string | null {
   return newest ? join(base, newest, 'skills') : null
 }
 
-export function fillTemplate(
-  template: string,
-  placeholders: Record<string, string>
-): string {
+export function fillTemplate(template: string, placeholders: Record<string, string>): string {
   let out = template
   for (const [key, value] of Object.entries(placeholders)) {
     out = out.replaceAll(`[${key}]`, value)
@@ -59,7 +57,11 @@ export function loadReviewerTemplate(name: ReviewerTemplate): string {
   if (skills) {
     const pluginPath = join(
       skills,
-      name === 'code-reviewer.md' ? 'requesting-code-review' : name === 'spec-document-reviewer-prompt.md' ? 'brainstorming' : 'writing-plans',
+      name === 'code-reviewer.md'
+        ? 'requesting-code-review'
+        : name === 'spec-document-reviewer-prompt.md'
+          ? 'brainstorming'
+          : 'writing-plans',
       name
     )
     try {

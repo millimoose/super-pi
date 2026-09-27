@@ -7,9 +7,7 @@ export class DirtyWorktreeError extends Error {
     public readonly worktreePath: string,
     public readonly files: string[]
   ) {
-    super(
-      `worktree "${worktreePath}" has uncommitted changes: ${files.join(', ')}`
-    )
+    super(`worktree "${worktreePath}" has uncommitted changes: ${files.join(', ')}`)
     this.name = 'DirtyWorktreeError'
   }
 }
@@ -19,10 +17,7 @@ export function worktreeDirFor(repoPath: string, branch: string): string {
   // branch names contain "/" (task/<id>-<slug>); flatten for a single directory.
   // git prints forward slashes on every platform — normalize to match.
   const safeBranch = branch.replaceAll('/', '-')
-  return join(dirname(repoPath), `${repoName}-worktrees`, safeBranch).replaceAll(
-    '\\',
-    '/'
-  )
+  return join(dirname(repoPath), `${repoName}-worktrees`, safeBranch).replaceAll('\\', '/')
 }
 
 export function gitAt(cwd: string): SimpleGit {
@@ -45,10 +40,7 @@ export async function createWorktree(
   return wtPath
 }
 
-export async function commitAll(
-  worktreePath: string,
-  message: string
-): Promise<string> {
+export async function commitAll(worktreePath: string, message: string): Promise<string> {
   const git = gitAt(worktreePath)
   await git.add('-A')
   const commit = await git.commit(message)
@@ -62,10 +54,7 @@ export async function push(worktreePath: string): Promise<void> {
 }
 
 /** SHA where the worktree's branch diverged from baseRef (reviewer BASE_SHA). */
-export async function branchPoint(
-  worktreePath: string,
-  baseRef: string
-): Promise<string> {
+export async function branchPoint(worktreePath: string, baseRef: string): Promise<string> {
   const sha = await gitAt(worktreePath).raw(['merge-base', 'HEAD', baseRef])
   return sha.trim()
 }
@@ -79,9 +68,7 @@ export async function removeWorktree(worktreePath: string): Promise<void> {
   const files = await dirtyFiles(worktreePath)
   if (files.length > 0) throw new DirtyWorktreeError(worktreePath, files)
   // run from the common git dir: deleting cwd fails on Windows
-  const commonDir = (
-    await gitAt(worktreePath).revparse('--git-common-dir')
-  ).trim()
+  const commonDir = (await gitAt(worktreePath).revparse('--git-common-dir')).trim()
   const mainGit = gitAt(dirname(commonDir))
   await mainGit.raw(['worktree', 'remove', worktreePath])
 }

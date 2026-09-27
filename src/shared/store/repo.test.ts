@@ -33,7 +33,10 @@ describe('repo helpers over memory storage', () => {
   let db: SuperPiDatabase
 
   beforeEach(async () => {
-    db = await createSuperPiDatabase(`test-${Math.random().toString(36).slice(2)}`, getRxStorageMemory())
+    db = await createSuperPiDatabase(
+      `test-${Math.random().toString(36).slice(2)}`,
+      getRxStorageMemory()
+    )
   })
 
   afterEach(async () => {
@@ -169,7 +172,13 @@ describe('repo helpers over memory storage', () => {
     await recordArtifact(db, { id: 's2', taskId: 't1', kind: 'spec', path: 'spec.md' })
     expect(await advanceTask(db, 't1', 'stage_complete')).toBe('spec_agent_review')
     expect(await advanceTask(db, 't1', 'agent_review_complete')).toBe('spec_human_review')
-    await recordReview(db, { id: 'hr2', artifactId: 's2', source: 'human', verdict: 'approved', summary: 'ok' })
+    await recordReview(db, {
+      id: 'hr2',
+      artifactId: 's2',
+      source: 'human',
+      verdict: 'approved',
+      summary: 'ok'
+    })
     expect(await advanceTask(db, 't1', 'human_approved')).toBe('planning')
     // plan round
     await recordArtifact(db, { id: 'p1', taskId: 't1', kind: 'plan', path: 'plan.md' })

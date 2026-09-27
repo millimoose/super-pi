@@ -88,7 +88,9 @@ export function rxSchema<T>(
 ): RxJsonSchema<T> {
   const js = t.toJsonSchema({
     // insurance only: timestamps are strings, this should never fire
-    fallback: { date: (ctx: { base: object }) => ({ ...ctx.base, type: 'string', format: 'date-time' }) }
+    fallback: {
+      date: (ctx: { base: object }) => ({ ...ctx.base, type: 'string', format: 'date-time' })
+    }
   }) as {
     $schema?: unknown
     properties: Record<string, { type?: string; enum?: unknown[]; maxLength?: number }>
@@ -99,7 +101,9 @@ export function rxSchema<T>(
   const props = js.properties
   const pk = props[primaryKey]
   if (!pk?.maxLength) {
-    throw new Error(`schema "${title}": primary key "${primaryKey}" is missing maxLength (arktype emission changed?)`)
+    throw new Error(
+      `schema "${title}": primary key "${primaryKey}" is missing maxLength (arktype emission changed?)`
+    )
   }
   for (const index of indexes) {
     const prop = props[index]

@@ -45,9 +45,17 @@ export class IllegalTransition extends Error {
 
 /** Stages that produce an artifact, mapped to their review stages and artifact kind. */
 export const PRODUCING = {
-  brainstorming: { agentReview: 'spec_agent_review', humanReview: 'spec_human_review', kind: 'spec' },
+  brainstorming: {
+    agentReview: 'spec_agent_review',
+    humanReview: 'spec_human_review',
+    kind: 'spec'
+  },
   planning: { agentReview: 'plan_agent_review', humanReview: 'plan_human_review', kind: 'plan' },
-  implementing: { agentReview: 'impl_agent_review', humanReview: 'impl_human_review', kind: 'implementation' }
+  implementing: {
+    agentReview: 'impl_agent_review',
+    humanReview: 'impl_human_review',
+    kind: 'implementation'
+  }
 } as const satisfies Record<string, { agentReview: Stage; humanReview: Stage; kind: string }>
 
 export type ProducingStage = keyof typeof PRODUCING

@@ -10,9 +10,7 @@ export type TokenSource = 'gh' | 'env'
  * Resolve the GitHub token: `gh auth token` subprocess → GITHUB_TOKEN env.
  * Returns undefined when no source works — callers degrade to local-only mode.
  */
-export async function resolveToken(): Promise<
-  { token: string; source: TokenSource } | undefined
-> {
+export async function resolveToken(): Promise<{ token: string; source: TokenSource } | undefined> {
   try {
     const { stdout } = await execFileAsync('gh', ['auth', 'token'])
     const token = stdout.trim()

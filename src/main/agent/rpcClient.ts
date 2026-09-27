@@ -37,7 +37,10 @@ export type RpcClientOptions = {
 
 export class RpcClient extends EventEmitter {
   private child: ChildProcessWithoutNullStreams
-  private pending = new Map<string, { resolve: (f: RpcFrame) => void; reject: (e: Error) => void }>()
+  private pending = new Map<
+    string,
+    { resolve: (f: RpcFrame) => void; reject: (e: Error) => void }
+  >()
   private nextId = 1
   private readline: ReturnType<typeof createInterface>
   public ready: Promise<RpcFrame>
@@ -49,17 +52,22 @@ export class RpcClient extends EventEmitter {
       bin,
       [
         ...(options.ompArgs ?? process.env['SUPER_PI_OMP_ARGS']?.split('\u0000') ?? []),
-        '--mode', 'rpc',
+        '--mode',
+        'rpc',
         '--no-ui',
-        '--cwd', options.cwd,
-        '--session-dir', options.sessionDir,
-        '--approval-mode', 'yolo'
+        '--cwd',
+        options.cwd,
+        '--session-dir',
+        options.sessionDir,
+        '--approval-mode',
+        'yolo'
       ],
       { cwd: options.cwd, env: { ...process.env, ...options.env } }
     )
     this.child.on('exit', (code, signal) => {
       this.emit('exit', { code, signal })
-      for (const p of this.pending.values()) p.reject(new Error(`omp rpc exited (code=${code}, signal=${signal})`))
+      for (const p of this.pending.values())
+        p.reject(new Error(`omp rpc exited (code=${code}, signal=${signal})`))
       this.pending.clear()
     })
     this.child.stderr.on('data', (d: Buffer) => this.emit('stderr', d.toString()))
@@ -67,20 +75,22 @@ export class RpcClient extends EventEmitter {
     this.readline = createInterface({ input: this.child.stdout })
     this.readline.on('line', (line) => this.handleLine(line))
 
-    this.ready = new Promise<RpcFrame>((resolve, reject) => {
+    this.ready = new Promise<RpcFrame>(
+      (resolve: (frame: RpcFrame) => void, reject: (err: Error) => void) => {
       const timer = setTimeout(() => reject(new Error('omp rpc: no ready frame')), 15_000)
-      const onReady = (frame: RpcFrame) => {
+      const onReady = (frame: RpcFrame): void => {
         clearTimeout(timer)
         this.off('exit', onExit)
         resolve(frame)
       }
-      const onExit = () => {
+      const onExit = (): void => {
         clearTimeout(timer)
         reject(new Error('omp rpc exited before ready'))
       }
       this.once('ready_frame', onReady)
       this.once('exit', onExit)
-    })
+      }
+    )
   }
 
   private handleLine(line: string): void {

@@ -18,7 +18,10 @@ export type SuperPiDatabase = RxDatabase<SuperPiCollections>
 
 export type TaskInput = Omit<TaskDoc, 'stage' | 'createdAt' | 'updatedAt'> & { stage?: Stage }
 
-export async function createTask(db: SuperPiDatabase, input: TaskInput): Promise<RxDocument<TaskDoc>> {
+export async function createTask(
+  db: SuperPiDatabase,
+  input: TaskInput
+): Promise<RxDocument<TaskDoc>> {
   const now = new Date().toISOString()
   const doc: TaskDoc = {
     ...input,

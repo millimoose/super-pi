@@ -9,6 +9,7 @@ import type { IssueTracker } from './trackers/tracker'
 import { createWorktree, removeWorktree, commitAll, push, branchPoint } from './git/worktreeService'
 import { SessionService } from './agent/sessionService'
 import { generateTitleSlug } from './agent/titleSlugService'
+import { isOmpAvailable } from './agent/ompProbe'
 import { loadReviewerTemplate } from './prompts/templates'
 
 /**
@@ -172,6 +173,7 @@ export function registerIpc(services: MainServices): void {
   ipcMain.handle('super-pi:agent/generateTitleSlug', (_e, prompt: string, repoPath: string) =>
     generateTitleSlug(prompt, { cwd: repoPath })
   )
+  ipcMain.handle('super-pi:agent/ompAvailable', () => isOmpAvailable())
 
   // --- prompts (reviewer templates) ---
   ipcMain.handle('super-pi:prompts/loadReviewerTemplate', (_e, name: string) =>

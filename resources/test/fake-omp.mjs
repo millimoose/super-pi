@@ -15,6 +15,11 @@ import readline from 'node:readline'
 const mode = process.env['SUPER_PI_FAKE_MODE'] ?? 'rpc'
 const args = process.argv.slice(2)
 
+if (args.includes('--version')) {
+  process.stdout.write('fake-omp 1.0.0\n')
+  process.exit(0)
+}
+
 if (args.includes('-p')) {
   if (mode === 'print-ok') {
     process.stdout.write('Here you go: {"title":"Dark mode toggle","slug":"dark-mode-toggle"}\n')

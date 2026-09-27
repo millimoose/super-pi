@@ -77,7 +77,9 @@ const superPi = {
       prompt: string,
       repoPath: string
     ): Promise<{ title: string; slug: string }> =>
-      ipcRenderer.invoke('super-pi:agent/generateTitleSlug', prompt, repoPath)
+      ipcRenderer.invoke('super-pi:agent/generateTitleSlug', prompt, repoPath),
+    /** false → the app shows the setup screen and blocks task creation */
+    ompAvailable: (): Promise<boolean> => ipcRenderer.invoke('super-pi:agent/ompAvailable')
   },
   agentEvents: {
     /** Subscribe to validated RPC frames for one task. Returns unsubscribe. */

@@ -57,8 +57,8 @@ export function TaskListView({ db }: { db: SuperPiDatabase }): React.JSX.Element
             margin: '8px 0'
           }}
         >
-          Local-only mode: no GitHub token found. Tasks still run fully; issue tracking
-          and PR reviews are disabled until you run <code>gh auth login</code> or set{' '}
+          Local-only mode: no GitHub token found. Tasks still run fully; issue tracking and PR
+          reviews are disabled until you run <code>gh auth login</code> or set{' '}
           <code>GITHUB_TOKEN</code>.
         </div>
       )}

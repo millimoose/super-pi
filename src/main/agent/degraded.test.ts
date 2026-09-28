@@ -81,8 +81,6 @@ describe('degraded mode: child exits mid-stage', () => {
       expect(Array.isArray(outcome.transcript)).toBe(true)
     }
     // stage unchanged — retry is the only way forward
-    expect((await db.collections.tasks.findOne('t-degraded').exec())?.stage).toBe(
-      'brainstorming'
-    )
+    expect((await db.collections.tasks.findOne('t-degraded').exec())?.stage).toBe('brainstorming')
   }, 60_000)
 })

@@ -66,25 +66,61 @@ async function seedReadyToLand(db: SuperPiDatabase, prNumber?: number): Promise<
   // spec: produce → agent review → human approval
   await recordArtifact(db, { id: 's1', taskId: 'task-1', kind: 'spec', path: 'spec.md' })
   await advanceTask(db, 'task-1', 'stage_complete') // spec_agent_review
-  await recordReview(db, { id: 'r1', artifactId: 's1', source: 'agent', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r1',
+    artifactId: 's1',
+    source: 'agent',
+    verdict: 'approved',
+    summary: ''
+  })
   await advanceTask(db, 'task-1', 'agent_review_complete') // spec_human_review
-  await recordReview(db, { id: 'r2', artifactId: 's1', source: 'human', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r2',
+    artifactId: 's1',
+    source: 'human',
+    verdict: 'approved',
+    summary: ''
+  })
   await advanceTask(db, 'task-1', 'human_approved') // planning
 
   // plan: same loop
   await recordArtifact(db, { id: 'p1', taskId: 'task-1', kind: 'plan', path: 'plan.md' })
   await advanceTask(db, 'task-1', 'stage_complete') // plan_agent_review
-  await recordReview(db, { id: 'r3', artifactId: 'p1', source: 'agent', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r3',
+    artifactId: 'p1',
+    source: 'agent',
+    verdict: 'approved',
+    summary: ''
+  })
   await advanceTask(db, 'task-1', 'agent_review_complete') // plan_human_review
-  await recordReview(db, { id: 'r4', artifactId: 'p1', source: 'human', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r4',
+    artifactId: 'p1',
+    source: 'human',
+    verdict: 'approved',
+    summary: ''
+  })
   await advanceTask(db, 'task-1', 'human_approved') // implementing
 
   // implementation: produce → agent review → human review (landing point)
   await recordArtifact(db, { id: 'i1', taskId: 'task-1', kind: 'implementation', path: '.' })
   await advanceTask(db, 'task-1', 'stage_complete') // impl_agent_review
-  await recordReview(db, { id: 'r5', artifactId: 'i1', source: 'agent', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r5',
+    artifactId: 'i1',
+    source: 'agent',
+    verdict: 'approved',
+    summary: ''
+  })
   await advanceTask(db, 'task-1', 'agent_review_complete') // impl_human_review
-  await recordReview(db, { id: 'r6', artifactId: 'i1', source: 'human', verdict: 'approved', summary: '' })
+  await recordReview(db, {
+    id: 'r6',
+    artifactId: 'i1',
+    source: 'human',
+    verdict: 'approved',
+    summary: ''
+  })
 }
 
 describe('landTask', () => {
@@ -110,7 +146,13 @@ describe('landTask', () => {
     const db = await makeDb()
     await seedReadyToLand(db, 7)
     // downgrade the impl artifact: record a fresh human changes_requested
-    await recordReview(db, { id: 'r7', artifactId: 'i1', source: 'human', verdict: 'changes_requested', summary: 'no' })
+    await recordReview(db, {
+      id: 'r7',
+      artifactId: 'i1',
+      source: 'human',
+      verdict: 'changes_requested',
+      summary: 'no'
+    })
     const bridges = recordingBridges()
     await expect(landTask(db, 'task-1', bridges)).rejects.toThrow(/not approved/)
     expect(bridges.calls).toEqual([])

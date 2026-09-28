@@ -20,13 +20,21 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      // a task-runner must keep rendering (and keep React scheduled) while
+      // occluded/minimized — occlusion throttling froze first paint entirely
+      backgroundThrottling: false
     }
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+  // ready-to-show never fires if the first paint is throttled (hidden window
+  // deadlock); force-show shortly after creation so the window always appears
+  setTimeout(() => {
+    if (!mainWindow.isDestroyed() && !mainWindow.isVisible()) mainWindow.show()
+  }, 1500)
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)

@@ -30,7 +30,11 @@ export async function landTask(
   }
   if (!task.prNumber) throw new Error('task has no PR — create the draft PR first')
 
-  await bridges.markPRReady({ owner: task.githubOwner, repo: task.githubRepo, prNumber: task.prNumber })
+  await bridges.markPRReady({
+    owner: task.githubOwner,
+    repo: task.githubRepo,
+    prNumber: task.prNumber
+  })
   await bridges.mergePR({ owner: task.githubOwner, repo: task.githubRepo, prNumber: task.prNumber })
   if (task.worktreePath) {
     await bridges.removeWorktree(task.worktreePath)

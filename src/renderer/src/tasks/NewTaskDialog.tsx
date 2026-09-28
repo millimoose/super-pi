@@ -155,6 +155,7 @@ export function NewTaskDialog({
       <div
         style={{
           background: '#fff',
+          color: '#111',
           borderRadius: 8,
           padding: 20,
           width: 560,

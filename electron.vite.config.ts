@@ -24,6 +24,11 @@ export default defineConfig({
         '@shared': resolve('src/shared')
       }
     },
+    define: {
+      // ship development React in the packaged app: full (non-minified) error
+      // messages with component hints — bloat accepted deliberately
+      'process.env.NODE_ENV': '"development"'
+    },
     plugins: [react()]
   }
 })

@@ -6,7 +6,11 @@ import App from './App'
 
 // Last-resort visibility: unhandled failures paint a banner instead of a
 // blank window (renderer crashes otherwise leave no trace outside devtools).
+let fatalCount = 0
 function showFatal(kind: string, text: string): void {
+  // a render loop can fire dozens of these — cap the stack
+  if (fatalCount >= 3) return
+  fatalCount++
   const el = document.createElement('div')
   el.style.cssText =
     'position:fixed;inset:auto 12px 12px 12px;z-index:99999;background:#c00;color:#fff;' +

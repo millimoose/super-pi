@@ -6,6 +6,10 @@ import { STAGES } from '@shared/domain/stageMachine'
 import { NewTaskDialog } from './NewTaskDialog'
 import { TaskDetailView } from './TaskDetailView'
 
+// stable identity: useRxQuery's deps include the query object, so a fresh
+// literal per render would resubscribe every emission (React #185 loop)
+const TASKS_QUERY = { sort: [{ updatedAt: 'desc' as const }] }
+
 export function TaskListView({ db }: { db: SuperPiDatabase }): React.JSX.Element {
   const [selected, setSelected] = useState<string | null>(null)
   const [newDialogOpen, setNewDialogOpen] = useState(false)
@@ -28,7 +32,7 @@ export function TaskListView({ db }: { db: SuperPiDatabase }): React.JSX.Element
 
   const { results: tasks } = useLiveRxQuery<TaskDoc>({
     collection: db.collections.tasks,
-    query: { sort: [{ updatedAt: 'desc' }] }
+    query: TASKS_QUERY
   })
 
   const selectedDoc = useMemo(
